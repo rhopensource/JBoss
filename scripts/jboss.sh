@@ -1,4 +1,4 @@
-#!//usr/bin/bash
+#!/usr/bin/bash
 # ---------------------------------------------------------------------------
 # jboss.sh - JBoss Demo Environment Setup
 

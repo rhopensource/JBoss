@@ -74,12 +74,6 @@ _EOF_
 
 jon_help_message() {
 
-echo "ALTER USER postgres PASSWORD 'postgres';" > /tmp/jbosson.sql
-echo "CREATE USER rhqadmin PASSWORD 'rhqadmin';" >> /tmp/jbosson.sql
-echo "CREATE DATABASE rhq OWNER rhqadmin;" >> /tmp/jbosson.sql
-echo "ALTER USER rhqadmin SET statement_timeout=0;" >> /tmp/jbosson.sql
-chmod 644 /tmp/jbosson.sql
-
   cat <<- _EOF_
 $PROGNAME ver. $VERSION
 JBoss Demo Environment Setup
@@ -215,11 +209,11 @@ then
   log "JBoss Demo Environment Setup ver. $VERSION"
   log "Downloading JBoss Operations Network from $server"
   log "Checking for JBoss-ON directory at `/usr/bin/pwd`"
-  if [ -d JBoss-ON ]
+  if [ -d Downloads/JBoss-ON ]
   then
     log_exit "JBoss-ON directory exists! Please rename it and then rerun this script"
   else
-    mkdir JBoss-ON; chmod 755 JBoss-ON; cd JBoss-ON
+    mkdir -p Downloads/JBoss-ON; chmod 755 Downloads/JBoss-ON; cd Downloads/JBoss-ON
     log "Created JBoss-ON directory"
   fi
 
@@ -234,10 +228,19 @@ then
   jget http://$server/released/JBossON/3.3.0/jon-plugin-pack-fuse-3.3.0.GA.zip
   jget http://$server/released/JBossON/3.3.0/jon-plugin-pack-jdg-3.3.0.GA.zip
 
+  echo "ALTER USER postgres PASSWORD 'postgres';" > jbosson.sql
+  echo "CREATE USER rhqadmin PASSWORD 'rhqadmin';" >> jbosson.sql
+  echo "CREATE DATABASE rhq OWNER rhqadmin;" >> jbosson.sql
+  echo "ALTER USER rhqadmin SET statement_timeout=0;" >> jbosson.sql
+  cp jbosson.sql /tmp/jbosson.sql
+  chmod 644 jbosson.sql /tmp/jbosson.sql
+
   echo "================================================================================="
   ls -l | fgrep -v wget.log
   echo "================================================================================="
   echo 
+  echo "Run $PROGNAME --jon-help for details about Postgres database setup prior to installing JBoss Operations Network"
+  echo
 fi
 
 # Exit

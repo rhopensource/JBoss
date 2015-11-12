@@ -15,8 +15,6 @@
 # GNU General Public License at <http://www.gnu.org/licenses/> for
 # more details.
 
-# Usage: jboss.sh [-h|--help] [-s server -d|-i] [jon|eap]
-
 # Revision history:
 # 2015-11-12 Created 
 # ---------------------------------------------------------------------------
@@ -53,7 +51,7 @@ signal_exit() {
 }
 
 usage() {
-  echo -e "Usage: $PROGNAME [-h|--help] [-s server -d|-i] [jon|eap]"
+  echo -e "Usage: $PROGNAME [-h|--help|--jon-help] [-s server -d|-i] [jon|eap]"
 }
 
 help_message() {
@@ -64,13 +62,67 @@ help_message() {
   $(usage)
 
   Options:
-  -h, --help help message
+  -h, --help This help message
+  --jon-help JBoss-ON database setup help
   -d  Download
   -i  Install
   -s  Server hostname to download from
 
 _EOF_
   return
+}
+
+jon_help_message() {
+
+echo "ALTER USER postgres PASSWORD 'postgres';" > /tmp/jbosson.sql
+echo "CREATE USER rhqadmin PASSWORD 'rhqadmin';" >> /tmp/jbosson.sql
+echo "CREATE DATABASE rhq OWNER rhqadmin;" >> /tmp/jbosson.sql
+echo "ALTER USER rhqadmin SET statement_timeout=0;" >> /tmp/jbosson.sql
+chmod 644 /tmp/jbosson.sql
+
+  cat <<- _EOF_
+$PROGNAME ver. $VERSION
+JBoss Demo Environment Setup
+
+Postgres database setup for JBoss Operations Network
+
+Step 1: Setup sudo access by logging in as root and execute visudo command. Verify setup by executing "sudo id" and check if it ran as root.
+
+Step 2: If Postgres database is not already installed, download and install it in your local RHEL environment using the following commands:
+
+sudo yum install -y postgres\*
+sudo service postgresql initdb
+sudo service postgresql start
+sudo service postgresql status
+sudo service postgresql stop
+
+Step 3: Search and uncomment and update each of the parameters in postgresql.conf file as shown below.
+
+# Performance changes for JBoss ON
+shared_buffers = 80MB    
+work_mem = 2048MB       
+checkpoint_segments = 10
+
+sudo su - postgres -c "vi /var/lib/pgsql/data/postgresql.conf"
+
+Step 4: Start Postgres database
+sudo service postgresql start
+sudo service postgresql status
+
+Step 5: /tmp/jbosson.sql has been created with SQL commands to be run in Postgres. Execute it.
+
+sudo su - postgres -c "psql -f /tmp/jbosson.sql"
+
+Step 6: Modify the file pg_hba.conf and replace all authentication methods to md5 in the end of the file.
+sudo su - postgres -c "vi /var/lib/pgsql/data/pg_hba.conf"
+
+Step 7: Restart Postgres
+
+sudo service postgresql stop
+sudo service postgresql start
+sudo service postgresql status
+  
+_EOF_
 }
 
 # Trap signals
@@ -86,6 +138,8 @@ while [[ -n $1 ]]; do
   case $1 in
     -h | --help)
       help_message; graceful_exit ;;
+    --jon-help)
+      jon_help_message; graceful_exit ;;
     -d)
       if [ "x$target" != "x" ]
       then
@@ -183,6 +237,7 @@ then
   echo "================================================================================="
   ls -l | fgrep -v wget.log
   echo "================================================================================="
+  echo 
 fi
 
 # Exit

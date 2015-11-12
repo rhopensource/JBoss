@@ -243,5 +243,31 @@ then
   echo
 fi
 
+if [ "x$action" = "xinstall" -a "x$target" = "xjon" ]
+then
+  log "JBoss Demo Environment Setup ver. $VERSION"
+  log "Installing JBoss Operations Network under [$server]"
+  log "Looking for Downloads/JBoss-ON directory"
+  if [ ! -d Downloads/JBoss-ON ]
+  then
+    log_exit "Error ... Unable to find Downloads/JBoss-ON. Download and then rerun. Exiting!"
+  else
+    log "Found Downloads/JBoss-ON directory!"
+  fi
+
+  if [ -d $server/JBoss-ON ]
+  then
+    log_exit "Error ... [$server/JBoss-ON] already exists. Please rename it and then rerun. Exiting!"
+  else
+    mkdir -p $server/JBoss-ON
+    if [ -d $server/JBoss-ON ]
+    then
+      log "[$server/JBoss-ON] created!"
+    else
+      log_exit "Error ... Unable to create [$server/JBoss-ON] directory. Please check and then rerun. Exiting!"
+    fi
+  fi
+
+fi
 # Exit
 graceful_exit

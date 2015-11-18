@@ -48,7 +48,15 @@ export v_Error=
 
 while [[ -n $1 ]]; do
   case $1 in
-  -h) echo Help; exit 1;;
+  -h) 
+      if [ -r help_message.txt ]
+      then
+        less help_message.txt
+        exit 0
+      else
+        error_exit "Missing help file"
+      fi
+      ;;
   -d) shift; v_D=D; v_SW=$1 ;;
   -i) shift; v_I=I; v_SW=$1 ;;
   -f) shift; v_From=$1 ;;
@@ -67,6 +75,22 @@ then
   v_Action=Install
 else
   error_exit "Invalid option";
+fi
+
+case "$v_SW" in
+  jon) ;;
+  eap) ;;
+  *) error_exit "Invalid option" ;;
+esac
+
+if [ "x$v_Action" = "xDownload" -a "x$v_From" = "x" ]
+then
+  error_exit "Missing download server details"
+fi
+
+if [ "x$v_Action" = "xInstall" -a "x$v_To" = "x" ]
+then
+  error_exit "Missing install destination details"
 fi
 
 exit 0

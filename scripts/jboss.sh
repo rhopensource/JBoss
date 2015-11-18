@@ -23,7 +23,7 @@ PROGNAME=${0##*/}
 VERSION="0.1"
 
 usage() { 
-  echo "Usage: $PROGNAME [-d|-i] [jon|eap] [-f server] [-t destination]"
+  echo "Usage: $PROGNAME [-d|-i] [jon|eap|jws|fuse|amq|jdg|dv] [-f server] [-t destination]"
 }
 
 error_exit() {
@@ -84,8 +84,13 @@ else
 fi
 
 case "$v_SW" in
-  jon) v_Dir=JBossON ;;
+  jon) v_Dir=JBOSS-ON ;;
   eap) v_Dir=EAP ;;
+  jws) v_Dir=JWS ;;
+  fuse) v_Dir=FUSE ;;
+  amq) v_Dir=A-MQ ;;
+  dv) v_Dir=DV ;;
+  jdg) v_Dir=JDG ;;
   *) error_exit "Invalid option" ;;
 esac
 
@@ -129,7 +134,6 @@ then
   do
     basefile=`/usr/bin/basename $urlpath`
     wget -O "$v_To/$basefile"  "http://$v_From$urlpath"
- 
   done
 fi
 

@@ -84,7 +84,7 @@ else
 fi
 
 case "$v_SW" in
-  jon) v_Dir=JBOSS-ON ;;
+  jon) v_Dir=JBossON ;;
   eap) v_Dir=EAP ;;
   *) error_exit "Invalid option" ;;
 esac

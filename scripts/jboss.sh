@@ -45,6 +45,7 @@ export v_From=
 export v_To=
 export v_SW=
 export v_Error=
+export v_Dir=
 
 while [[ -n $1 ]]; do
   case $1 in
@@ -83,8 +84,8 @@ else
 fi
 
 case "$v_SW" in
-  jon) ;;
-  eap) ;;
+  jon) v_Dir=JBOSS-ON ;;
+  eap) v_Dir=EAP ;;
   *) error_exit "Invalid option" ;;
 esac
 
@@ -96,6 +97,40 @@ fi
 if [ "x$v_Action" = "xInstall" -a "x$v_To" = "x" ]
 then
   error_exit "Missing install destination details"
+fi
+
+if [ "x$v_Action" = "xDownload" -a ! -r files.dat -a -x /usr/bin/wget ]
+then
+  wget https://raw.githubusercontent.com/rhopensource/JBoss/master/scripts/files.dat
+  if [ ! -r files.dat ]
+  then
+    error_exit "Missing files.dat"
+  fi
+fi
+
+
+if [ "x$v_Action" = "xDownload" ]
+then
+
+  if [ "x$v_To" = "x" ]
+  then
+    v_To="./JBoss-Downloads/$v_Dir"
+  else
+    v_To="$v_To/$v_Dir"
+  fi
+
+  if [ ! -d $v_To ]
+  then
+    mkdir -p $v_To
+    chmod 755 $v_To
+  fi
+
+  grep "${v_SW}=" files.dat | sed -e "s!$v_SW=!!g" | while read urlpath
+  do
+    basefile=`/usr/bin/basename $urlpath`
+    wget -O "$v_To/$basefile"  "http://$v_From$urlpath"
+ 
+  done
 fi
 
 exit 0

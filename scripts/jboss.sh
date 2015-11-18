@@ -53,6 +53,11 @@ while [[ -n $1 ]]; do
       then
         less help_message.txt
         exit 0
+      elif [ -x /usr/bin/wget ]
+        then
+        wget https://raw.githubusercontent.com/rhopensource/JBoss/master/scripts/help_message.txt
+        less help_message.txt
+        exit 0
       else
         error_exit "Missing help file"
       fi
